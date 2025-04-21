@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct pile pile;
+struct pile
+{
+   int valeur;
+   pile *suivant;
+};
+void push(pile**top,int valeur)
+{ pile *p=(pile*)malloc(sizeof(pile));
+if(!p)
+{
+    printf("erreur d'allocation\n");
+}
+else
+{
+    p->valeur=valeur;
+    p->suivant=*top;
+    *top=p;
+}
+}
+void pop(pile **top)
+{
+    if(*top==NULL)
+    {
+        printf("pile vide\n");
+    }
+    else
+    {
+        pile *tmp=*top;
+        *top=tmp->suivant;
+        free(tmp);
+    }
+}
+void affichage(pile**top)
+{
+if(*top==NULL)
+    {
+        printf("pile vide\n");
+    }
+    else
+    {
+        pile *tmp=*top;
+        while(tmp!=NULL)
+            {printf("%d\n",tmp->valeur);
+        tmp=tmp->suivant;
+    }
+}
+}
+int main()
+{
+    int s,n,i;
+    pile *top=NULL;
+    printf("combien de valeur a ajouter:\n");
+scanf("%d",&n);
+for(i=0;i<n;i++)
+{printf("entrer une valeur :\n");
+scanf("%d",&s);
+push(&top,s);}
+printf("afficher toute les valeurs de la pile:\n");
+affichage(&top);
+printf("combien de valeur a supprimmer:\n");
+scanf("%d",&n);
+for(i=0;i<n;i++)
+{pop(&top);}
+printf("afficher toute les valeurs de la pile APRES %d SUPPRESSION:\n",n);
+affichage(&top);
+
+    return 0;
+}
