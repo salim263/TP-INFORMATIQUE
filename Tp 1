@@ -1,0 +1,194 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Noeud {
+    int valeur;
+    struct Noeud *suivant;
+} Noeud;
+
+Noeud* creer(int valeur) {
+    Noeud* nv = (Noeud*)malloc(sizeof(Noeud));
+    nv->valeur = valeur;
+    nv->suivant = NULL;
+    return nv;
+}
+
+void affiche(Noeud *debut) {
+    Noeud *tmp = debut;
+    while (tmp != NULL) {
+      printf(" la valeur est %d\n -> ", tmp->valeur);
+        tmp = tmp->suivant;
+    }
+}
+Noeud* ajouterD(Noeud *debut, int valeur) {
+    Noeud* nv;
+     nv = (Noeud*)malloc(sizeof(Noeud));
+    nv->valeur = valeur;
+    nv->suivant = NULL;
+if(debut == NULL){
+debut = nv;
+}
+nv->suivant = debut;
+debut = nv;
+    return debut;
+}
+Noeud* ajouterF(Noeud *debut, int valeur) {
+    Noeud* ajouterD(Noeud *debut, int valeur) {
+    Noeud* nv;
+     nv = (Noeud*)malloc(sizeof(Noeud));
+    nv->valeur = valeur;
+    nv->suivant = NULL;
+if(debut == NULL){
+debut = nv;
+}
+Noeud*a
+a = debut;
+while (a->suivant != NULL) {
+        a = a->suivant;
+    }
+a->suivant= nv;
+    return debut;
+}
+int taille(Noeud *debut) {
+    int cpt = 0;
+    Noeud *tmp = debut;
+    while (tmp != NULL) {
+        cpt++;
+        tmp = tmp->suivant;
+    }
+    return cpt;
+}
+Noeud* inserer(Noeud *debut, int pos, int valeur) {
+    if (pos <= 0){
+return ajouterD(debut, valeur);
+}
+    if (pos >= taille(debut)) {
+return ajouterF(debut, valeur);
+}
+    Noeud* nv = valeur;
+    Noeud* tmp = debut;
+    for (int i = 0; i < pos - 1; i++){
+    tmp = tmp->suivant;
+    nv->suivant = tmp->suivant;
+}
+    tmp->suivant = nv;
+    return debut;
+}
+void rechercher(Noeud *debut, int valeur) {
+    int b = 0;
+    Noeud* tmp;
+    tmp = debut;
+    while (tmp != NULL) {
+        if (tmp->valeur == valeur) {
+           b=1;
+          break;
+        }else{
+        b=0;
+}
+        tmp = tmp->suivant;
+        
+    }
+   if(b == 1){
+printf("la valeur existe");
+}else{
+printf("erreur valeur inexistante");
+}
+Noeud* suppressionD(Noeud *debut) {
+    if (debut == NULL){
+  return NULL;
+}else{
+    Noeud* tmp = debut;
+    debut = debut->suivant;
+    free(tmp);
+}
+    return debut;
+}
+Noeud* suppressionF(Noeud *debut) {
+    if (debut == NULL || debut->suivant == NULL){
+  return NULL;
+}
+    Noeud* tmp = debut;
+    while (tmp->suivant->suivant != NULL){
+  tmp = tmp->suivant;
+}
+    free(tmp->suivant);
+    tmp->suivant = NULL;
+    return debut;
+}
+Noeud* suppressionP(Noeud *debut, int pos) {
+    if (pos <= 0){
+return suppressionD(debut);
+}
+    if (pos >= taille(debut) - 1){
+    Noeud* tmp = debut;
+return suppressionF(debut);
+}
+    for (int i = 0; i < pos - 1; i++){
+tmp = tmp->suivant;
+}
+    Noeud* aSupprimer = tmp->suivant;
+    tmp->suivant = aSupprimer->suivant;
+    free(aSupprimer);
+    return debut;
+}
+Noeud* modifierD(Noeud *debut, int valeur) {
+    if (debut == NULL){
+    return NULL;
+}
+debut->valeur = valeur;
+    return debut;
+}
+Noeud* modifierF(Noeud *debut, int valeur) {
+    if (debut == NULL){
+printf("liste est vide");
+    return NULL;
+}
+    Noeud* tmp = debut;
+    while (tmp->suivant != NULL){
+    tmp = tmp->suivant;
+}
+    tmp->valeur = valeur;
+    return debut;
+}
+Noeud* modifierP(Noeud *debut, int pos, int valeur) {
+if (debut == NULL){
+printf("liste est vide");
+    return NULL;
+}
+    Noeud* tmp = debut;
+    for (int i = 0; i < pos && tmp != NULL; i++){
+    tmp = tmp->suivant;
+}
+    if (tmp != NULL){
+    tmp->valeur = valeur;
+}
+    return debut;
+}
+int main() {
+    Noeud *liste = NULL;
+
+    liste = ajouterF(liste, 10);
+    liste = ajouterF(liste, 20);
+    liste = ajouterF(liste, 30);
+
+    affiche(liste);
+
+    liste = ajouterD(liste, 5);
+    liste = ajouterF(liste, 40);
+    liste = inserer(liste, 2, 15);
+    affiche(liste);
+
+    rechercher(liste, 20);
+
+    liste = suppressionD(liste);
+    liste = suppressionF(liste);
+    liste = suppressionP(liste, 2);
+    affiche(liste);
+
+    liste = modifierD(liste, 100);
+    liste = modifierF(liste, 200);
+    liste = modifierP(liste, 1, 150);
+    affiche(liste);
+
+    return 0;
+}
