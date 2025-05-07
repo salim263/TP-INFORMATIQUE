@@ -1,0 +1,144 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Date {
+    char jour[3];
+    char mois[3];
+    char annee[5];
+} date;
+
+typedef struct Produit {
+    char *Nom_produit;
+    char Reference[100];
+    float Montant;
+    date DateAchat;
+} produit;
+
+typedef struct Liste {
+    produit cellule;
+    struct Liste* suiv;
+} liste;
+liste* creer_liste_produits() {
+    return NULL;
+}
+int est_vide(liste* tete) {
+    return (tete == NULL);
+}
+produit creer_produit() {
+    produit p;
+    p.Nom_produit = malloc(100 * sizeof(char));
+    printf("Nom produit : ");
+    scanf(" %s ", p.Nom_produit);
+    printf("Référence : ");
+    scanf(" %s", p.Reference);
+    printf("Montant : ");
+    scanf("%f", &p.Montant);
+    printf("Date d'achat (jj mm aaaa) : ");
+    scanf("%s %s %s", p.DateAchat.jour, p.DateAchat.mois, p.DateAchat.annee);
+    return p;
+}
+
+void afficher_produit(produit p) {
+    printf("Nom : %s | Référence : %s | Montant : %.2f | Date : %s/%s/%s\n",
+           p.Nom_produit, p.Reference, p.Montant, p.DateAchat.jour, p.DateAchat.mois, p.DateAchat.annee);
+}
+
+liste* ajouter_debut(liste* tete, produit p) {
+    liste* nv = (liste*)malloc(sizeof(liste));
+    nv->cellule = p;
+    nv->suiv = tete;
+    return nv;
+}
+liste* ajouter_fin(liste* tete, produit p) {
+    liste* nv = (liste*)malloc(sizeof(liste));
+    nv->cellule = p;
+    nv->suiv = NULL;
+    if (tete == NULL)
+        return nv;
+
+    liste* temp = tete;
+    while (temp->suiv != NULL)
+        temp = temp->suiv;
+    temp->suiv = nv;
+    return tete;
+}
+
+void afficher_produits(liste* tete) {
+    liste* temp = tete;
+    while (temp != NULL) {
+        afficher_produit(temp->cellule);
+        temp = temp->suiv;
+    }
+}
+
+int longueur(liste* tete) {
+    int cpt = 0;
+    while (tete != NULL) {
+        cpt++;
+        tete = tete->suiv;
+    }
+    return cpt;
+}
+
+void filtrer_date(liste* tete, date dt) {
+    while (tete != NULL) {
+        if (strcmp(tete->cellule.DateAchat.annee, dt.annee) > 0 ||                                                         
+            strcmp(tete->cellule.DateAchat.annee, dt.annee) == 0 &&
+             strcmp(tete->cellule.DateAchat.mois, dt.mois) > 0) ||
+            (strcmp(tete->cellule.DateAchat.annee, dt.annee) == 0 &&
+             strcmp(tete->cellule.DateAchat.mois, dt.mois) == 0 &&
+             strcmp(tete->cellule.DateAchat.jour, dt.jour) > 0)) {
+            afficher_produit(tete->cellule);
+        }
+        tete = tete->suiv;
+    }
+}
+liste* supprimer_debut(liste* tete) {
+    if (tete == NULL){
+    return NULL;
+}
+    liste* tmp = tete;
+    tete = tete->suiv;
+    free(tmp->cellule.Nom_produit);
+    free(tmp);
+    return tete;
+}
+
+liste* supprimer_fin(liste* tete) {
+    if (tete == NULL){
+    return NULL;
+}
+    if (tete->suiv == NULL) {
+        free(tete->cellule.Nom_produit);
+        free(tete);
+        return NULL;
+    }
+    liste* temp = tete;
+    while (temp->suiv->suiv != NULL){
+        temp = temp->suiv;
+}
+    free(temp->suiv->cellule.Nom_produit);
+    free(temp->suiv);
+    temp->suiv = NULL;
+    return tete;
+}
+int main() {
+    liste* stock = creer_liste_produits();
+    produit p1 = creer_produit();
+    produit p2 = creer_produit();
+    stock = ajouter_debut(stock, p1);
+    stock = ajouter_fin(stock, p2);
+    printf("Liste des produits :\n");
+    afficher_produits(stock);
+    printf("Nombre de produits : %d\n", longueur(stock));
+
+    date dt = {"01", "01", "2024"};
+    printf("\nProduits achetés après le 01/01/2024 :\n");
+    filtrer_date(stock, dt);
+    stock = supprimer_debut(stock);
+    stock = supprimer_fin(stock);
+    printf("Liste après suppressions :\n");
+    afficher_produits(stock);
+    return 0;
+}
