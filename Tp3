@@ -1,0 +1,199 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Noeud {
+    int valeur;
+    struct Noeud *suivant;
+    struct Noeud *precedent;
+} Noeud;
+Noeud* creer(int valeur) {
+    Noeud* nv = (Noeud*) malloc(sizeof(Noeud));
+    nv->valeur = valeur;
+    nv->suivant = NULL;
+    nv->precedent = NULL;
+    return nv;
+}
+void affiche(Noeud *debut) {
+    Noeud* tmp = debut;
+    while (tmp != NULL) {
+        printf("%d ", tmp->valeur);
+        if (tmp->suivant == NULL){
+          break;
+    }
+        tmp = tmp->suivant;
+    while (tmp != NULL) {
+        printf("%d ", tmp->valeur);
+        tmp = tmp->precedent;
+    }
+}
+Noeud* ajouterD(Noeud* debut, int valeur) {
+    Noeud* nv = creer(valeur);
+    nv->suivant = debut;
+    if (debut != NULL){
+    debut->precedent = nv;
+    return nv;
+}
+Noeud* ajouterF(Noeud* debut, int valeur) {
+    Noeud* nv = creer(valeur);
+    if (debut == NULL){
+    return nv;
+}
+    Noeud* tmp = debut;
+    while (tmp->suivant != NULL){
+        tmp = tmp->suivant;
+}
+    tmp->suivant = nv;
+    nv->precedent = tmp;
+    return debut;
+}
+int taille(Noeud* debut) {
+    int cpt = 0;
+    while (debut != NULL) {
+        cpt++;
+        debut = debut->suivant;
+    }
+    return cpt;
+}
+Noeud* insertionP(Noeud* debut, int pos, int valeur) {
+    if (pos < 1 || pos > taille(debut) + 1){
+    return debut;
+}
+    if (pos == 1){
+    return ajouterD(debut, valeur);
+}
+    Noeud* nv = creer(valeur);
+    Noeud* tmp = debut;
+    for (int i = 1; i < pos - 1; i++){
+    tmp = tmp->suivant;
+    nv->suivant = tmp->suivant;
+}
+    if (tmp->suivant != NULL){
+    tmp->suivant->precedent = n;
+}
+    tmp->suivant = n;
+    nv->precedent = tmp;
+    return debut;
+}
+Noeud* rechercher(Noeud* debut, int valeur) {
+    while (debut != NULL) {
+        if (debut->valeur == valeur)
+            return debut;
+        debut = debut->suivant;
+    }
+    return NULL;
+}
+Noeud* suppressionD(Noeud* debut) {
+    if (debut == NULL){
+    return NULL;
+}
+    Noeud* tmp = debut;
+    debut = debut->suivant;
+    if (debut != NULL){
+    debut->precedent = NULL;
+}
+    free(tmp);
+    return debut;
+}
+Noeud* suppressionF(Noeud* debut) {
+    if (debut == NULL){
+    return NULL;
+}
+    Noeud* tmp = debut;
+    while (tmp->suivant != NULL){
+    tmp = tmp->suivant;
+}
+    if (tmp->precedent != NULL){
+        tmp->precedent->suivant = NULL;
+   } else{
+        debut = NULL;
+}
+    free(tmp);
+    return debut;
+}
+Noeud* suppressionP(Noeud* debut, int pos) {
+    if (pos < 1 || pos > taille(debut)){
+    return debut;
+}
+    if (pos == 1){
+    return suppressionD(debut);
+}
+    Noeud* tmp = debut;
+    for (int i = 1; i < pos; i++){
+    tmp = tmp->suivant;
+}
+    if (tmp->suivant != NULL){
+    tmp->suivant->precedent = tmp->precedent;
+}
+    if (tmp->precedent != NULL){
+    tmp->precedent->suivant = tmp->suivant;
+}
+    free(tmp);
+    return debut;
+}
+Noeud* modifierD(Noeud* debut, int valeur) {
+    if (debut != NULL){
+    debut->valeur = valeur;
+}
+    return debut;
+}
+Noeud* modifierF(Noeud* debut, int valeur) {
+    if (debut == NULL){
+    return NULL;
+}
+    Noeud* tmp = debut;
+    while (tmp->suivant != NULL){
+    tmp = tmp->suivant;
+    tmp->valeur = valeur;
+}
+    return debut;
+}
+Noeud* modifierP(Noeud* debut, int pos, int valeur) {
+    if (pos < 1 || pos > taille(debut)){
+    return debut;
+}
+    Noeud* tmp = debut;
+    for (int i = 1; i < pos; i++){
+    tmp = tmp->suivant;
+    tmp->valeur = valeur;
+}
+    return debut;
+}
+Noeud* tri(Noeud* debut) {
+    if (debut == NULL){
+    return NULL
+}
+    int tmpval;
+    Noeud* i = debut;
+    while (i != NULL) {
+        Noeud* j = i->suivant;
+        while (j != NULL) {
+            if (i->valeur > j->valeur) {
+                tmpval = i->valeur;
+                i->valeur = j->valeur;
+                j->valeur = tmpval;
+            }
+            j = j->suivant;
+        }
+        i = i->suivant;
+    }
+    return debut;
+}
+int main() {
+    Noeud* liste = NULL;
+    liste = ajouterF(liste, 30);
+    liste = ajouterF(liste, 10);
+    liste = ajouterF(liste, 20);
+    liste = ajouterF(liste, 40);
+    
+    affiche(liste);
+
+    liste = ajouterD(liste, 5);
+    liste = insertionP(liste, 3, 15);
+    liste = suppressionP(liste, 2);
+    liste = modifierP(liste, 1, 8);
+    liste = tri(liste);
+
+    affiche(liste);
+
+    return 0;
+}
