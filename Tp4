@@ -1,0 +1,105 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Etudiant {
+    int id;
+    char nom[50];
+    float moyenne;
+    struct Etudiant* suivant;
+    struct Etudiant* precedent;
+} Etudiant;
+Etudiant* creer_etudiant() {
+    Etudiant* e = (Etudiant*)malloc(sizeof(Etudiant));
+    printf("ID: ");
+    scanf("%d", &e->id);
+    printf("Nom: ");
+    scanf("%s", e->nom);
+    printf("Moyenne: ");
+    scanf("%f", &e->moyenne);
+    e->suivant = NULL;
+    e->precedent = NULL;
+    return e;
+}
+int longueur(Etudiant* tete) {
+    int cpt = 0;
+    while (tete != NULL) {
+        cpt++;
+        tete = tete->suivant;
+    }
+    return cpt;
+}
+Etudiant* ajouter_position(Etudiant* tete, Etudiant* nouveau, int position) {
+    if (position <= 0 || tete == NULL) {
+        nv->suivant = tete;
+        if (tete) tete->precedent = nv;
+        return nv;
+    }
+    Etudiant* a = tete;
+    for (int i = 0; i < position - 1 && a->suivant != NULL; i++) {
+        a = a->suivant;
+    }
+    nv->suivant = a->suivant;
+    if (a->suivant != NULL){
+        a->suivant->precedent = nv;
+}
+    nv->precedent = a;
+    a->suivant = nv;
+    return tete;
+}
+Etudiant* supprimer_position(Etudiant* tete, int position) {
+    if (tete == NULL){
+    return NULL;
+}
+    Etudiant* a = tete;
+
+    if (position == 0) {
+        tete = tete->suivant;
+        if (tete){
+        tete->precedent = NULL;
+}
+        free(a);
+        return tete;
+    }
+
+    for (int i = 0; i < position && a != NULL; i++) {
+        a= a->suivant;
+    }
+
+    if (a == NULL){
+    return tete;
+}
+
+    if (a->precedent){
+    a->precedent->suivant = a->suivant;
+}
+    if (a->suivant){
+    a->suivant->precedent = a->precedent;
+}
+
+    free(a);
+    return tete;
+}
+void afficher_liste(Etudiant* tete) {
+    while (tete != NULL) {
+        printf("ID: %d, Nom: %s, Moyenne: %.2f\n", tete->id, tete->nom, tete->moyenne);
+        tete = tete->suivant;
+    }
+}
+Etudiant* derniere_cellule(Etudiant* tete) {
+    if (tete == NULL){
+    return NULL;
+}
+    while (tete->suivant != NULL) {
+        tete = tete->suivant;
+    }
+    return tete;
+}
+void afficher_inverse(Etudiant* tete) {
+    Etudiant* dernier = derniere_cellule(tete);
+    while (dernier != NULL) {
+        printf("ID: %d, Nom: %s, Moyenne: %.2f\n", dernier->id, dernier->nom, dernier->moyenne);
+        dernier = dernier->precedent;
+    }
+}
+
