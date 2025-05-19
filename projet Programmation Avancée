@@ -1,0 +1,497 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Maladie {
+    char nom[100];
+    char symptomes[255];
+    char traitements[255];
+    char categorie[100];
+    struct Maladie *suivant;
+} Maladie;
+
+typedef struct Patient {
+    char nom[100];
+    int age;
+    char sexe[10];
+    Maladie *maladieAssociee;
+    struct Patient *suivant;
+} Patient;
+
+Maladie *listeMaladies = NULL;
+Patient *listePatients = NULL;
+
+Maladie* creerMaladie(char nom[], char symptomes[], char traitements[], char categorie[]) {
+    Maladie *nv = (Maladie*)malloc(sizeof(Maladie));
+    strcpy(nv->nom, nom);
+    strcpy(nv->symptomes, symptomes);
+    strcpy(nv->traitements, traitements);
+    strcpy(nv->categorie, categorie);
+    nv->suivant = NULL;
+    return nv;
+}
+
+
+void ajouterMaladie() {
+    char nom[100], symptomes[255], traitements[255], categorie[100], cible[100];
+    int choix;
+
+    printf("\n--- AJOUT DE MALADIE ---\n");
+
+printf("1. Ajouter au debut\n");
+printf("2. Ajouter a la fin\n");
+printf("3. Ajouter apres une maladie specifique\n");
+printf("4. Retour au menu principal\n");
+printf("Choix : ");
+scanf("%d", &choix);
+
+if (choix == 4) return;
+
+
+    printf("Nom: ");
+    scanf(" %[^\n]", nom);
+    printf("Symptomes: ");
+    scanf(" %[^\n]", symptomes);
+    printf("Traitements: ");
+    scanf(" %[^\n]", traitements);
+    printf("Categorie: ");
+    scanf(" %[^\n]", categorie);
+
+    Maladie *nouvelle = creerMaladie(nom, symptomes, traitements, categorie);
+
+    if (choix == 1) {
+        nouvelle->suivant = listeMaladies;
+        listeMaladies = nouvelle;
+    } else if (choix == 2) {
+        if (listeMaladies == NULL) {
+        listeMaladies =nouvelle;
+    } else {
+        Maladie *tmp = listeMaladies;
+        while (tmp->suivant != NULL)
+            tmp = tmp->suivant;
+        tmp->suivant =nouvelle;
+    }
+    } else if (choix == 3) {
+        printf("Nom de la maladie apres laquelle ajouter : ");
+        scanf(" %[^\n]", cible);
+
+        Maladie *ptr= listeMaladies;
+        while (ptr != NULL && strcmp(ptr->nom, cible) != 0)
+            ptr = ptr->suivant;
+
+        if (ptr == NULL) {
+            printf("Maladie non trouvee. Ajout annuler.\n");
+            free(nouvelle);
+            return;
+        }
+
+        nouvelle->suivant = ptr->suivant;
+        ptr->suivant = nouvelle;
+    } else {
+        printf("Choix invalide. Ajout annuler.\n");
+        free(nouvelle);
+    }
+}
+
+void supprimerMaladie() {
+    int choix;
+    char nom[100];
+
+    printf("\n--- SUPPRESSION DE MALADIE ---\n");
+    printf("1. Supprimer au debut\n");
+    printf("2. Supprimer a la fin\n");
+    printf("3. Supprimer une maladie specifique\n");
+ printf("4. Retour au menu principal\n");
+printf("Choix : ");
+scanf("%d", &choix);
+
+if (choix == 4) return;
+
+
+    if (listeMaladies == NULL) {
+        printf("La liste des maladies est vide.\n");
+        return;
+    }
+
+    if (choix == 1) {
+        Maladie *tmp = listeMaladies;
+        listeMaladies = listeMaladies->suivant;
+        free(tmp);
+        printf("Maladie supprimee au debut.\n");
+    } else if (choix == 2) {
+        if (listeMaladies->suivant == NULL) {
+            free(listeMaladies);
+            listeMaladies = NULL;
+        } else {
+            Maladie *tmp = listeMaladies, *prec = NULL;
+            while (tmp->suivant != NULL) {
+                prec = tmp;
+                tmp = tmp->suivant;
+            }
+            prec->suivant = NULL;
+            free(tmp);
+        }
+        printf("Maladie supprimee a la fin.\n");
+    } else if (choix == 3) {
+        printf("Nom de la maladie a supprimer : ");
+        scanf(" %[^\n]", nom);
+        Maladie *tmp = listeMaladies, *prec = NULL;
+        while (tmp != NULL && strcmp(tmp->nom, nom) != 0) {
+            prec = tmp;
+            tmp = tmp->suivant;
+        }
+        if (tmp == NULL) {
+            printf("Maladie non trouvee.\n");
+            return;
+        }
+        if (prec == NULL) {
+            listeMaladies = tmp->suivant;
+        } else {
+            prec->suivant = tmp->suivant;
+        }
+        free(tmp);
+        printf("Maladie supprimee.\n");
+    } else {
+        printf("Choix invalide.\n");
+    }
+}
+
+
+Maladie* rechercherMaladie() {
+    int choix;
+    char critere[255];
+    Maladie *tmp = listeMaladies;
+    int trouve = 0;
+
+printf("Rechercher par :\n");
+printf("1. Nom\n");
+printf("2. Symptome\n");
+printf("3. Traitement\n");
+printf("4. Retour au menu principal\n");
+printf("Votre choix : ");
+scanf("%d", &choix);
+
+if (choix == 4) return NULL;
+
+    printf("Entrez le critere de recherche : ");
+    scanf(" %[^\n]", critere);
+
+    while (tmp != NULL) {
+        if ((choix == 1 && strcmp(tmp->nom, critere) == 0) ||
+            (choix == 2 && strstr(tmp->symptomes, critere) != NULL) ||
+            (choix == 3 && strstr(tmp->traitements, critere) != NULL)) {
+
+            printf("\n--- MALADIE TROUVEE ---\n");
+            printf("Nom: %s\nSymptomes: %s\nTraitements: %s\nCategorie: %s\n",
+                   tmp->nom, tmp->symptomes, tmp->traitements, tmp->categorie);
+            trouve = 1;
+        }
+        tmp = tmp->suivant;
+    }
+
+    if (!trouve) {
+        printf("Aucune maladie ne correspond a ce critere.\n");
+        return NULL;
+    }
+
+    return NULL;
+}
+Maladie* rechercherMaladieParNom(char nom[]) {
+    Maladie *tmp = listeMaladies;
+    while (tmp != NULL) {
+        if (strcmp(tmp->nom, nom) == 0) {
+            return tmp;
+        }
+        tmp = tmp->suivant;
+    }
+    return NULL;
+}
+
+
+
+void afficherMaladies() {
+    Maladie *tmp = listeMaladies;
+    if (!tmp) {
+        printf("Aucune maladie enregistree.\n");
+        return;
+    }
+    while (tmp != NULL) {
+        printf("\nNom: %s\nSymptomes: %s\nTraitements: %s\nCategorie: %s\n",tmp->nom, tmp->symptomes, tmp->traitements, tmp->categorie);
+        tmp = tmp->suivant;
+    }
+}
+
+void afficherMaladiesParCategorie() {
+    char categorie[100];
+    int trouve = 0;
+    printf("Entrez la categorie : ");
+    scanf(" %[^\n]", categorie);
+
+    Maladie *tmp = listeMaladies;
+    while (tmp != NULL) {
+        if (strcmp(tmp->categorie, categorie) == 0) {
+            printf("\nNom: %s\nSymptomes: %s\nTraitements: %s\n", tmp->nom, tmp->symptomes, tmp->traitements);
+            trouve = 1;
+        }
+        tmp = tmp->suivant;
+    }
+
+    if (!trouve)
+        printf("Aucune maladie trouvee dans cette categorie.\n");
+}
+
+void modifierMaladie(char nom[]) {
+    Maladie *m = rechercherMaladieParNom(nom);
+    if (m != NULL) {
+        printf("Nouveaux symptomes: ");
+        scanf(" %[^\n]", m->symptomes);
+        printf("Nouveaux traitements: ");
+        scanf(" %[^\n]", m->traitements);
+        printf("Nouvelle categorie: ");
+        scanf(" %[^\n]", m->categorie);
+        printf("Maladie modifiee.\n");
+    } else {
+        printf("Maladie non trouvee.\n");
+    }
+}
+
+void ajouterPatient() {
+    char nom[100], sexe[10], maladieNom[100], cible[100];
+    int age, choix;
+
+    printf("\n--- AJOUT DE PATIENT ---\n");
+    printf("1. Ajouter au debut\n");
+    printf("2. Ajouter a la fin\n");
+    printf("3. Ajouter apres un patient specifique\n");
+     printf("4. Retour au menu principal\n");
+printf("Choix : ");
+scanf("%d", &choix);
+
+if (choix == 4) return;
+
+    printf("Nom du patient : ");
+    scanf(" %[^\n]", nom);
+    printf("age : ");
+    scanf("%d", &age);
+    printf("Sexe : ");
+    scanf(" %[^\n]", sexe);
+    printf("Nom de la maladie : ");
+    scanf(" %[^\n]", maladieNom);
+
+    Maladie *maladie = rechercherMaladieParNom(maladieNom);
+    if (!maladie) {
+        printf("Maladie introuvable.\n");
+        return;
+    }
+
+    Patient *p = (Patient*)malloc(sizeof(Patient));
+    strcpy(p->nom, nom);
+    p->age = age;
+    strcpy(p->sexe, sexe);
+    p->maladieAssociee = maladie;
+    p->suivant = NULL;
+
+    if (choix == 1) {
+        p->suivant = listePatients;
+        listePatients = p;
+    } else if (choix == 2) {
+        if (!listePatients) {
+            listePatients = p;
+        } else {
+            Patient *tmp = listePatients;
+            while (tmp->suivant != NULL)
+                tmp = tmp->suivant;
+            tmp->suivant = p;
+        }
+    } else if (choix == 3) {
+        printf("Nom du patient de reference : ");
+        scanf(" %[^\n]", cible);
+
+        Patient *ref = listePatients;
+        while (ref != NULL && strcmp(ref->nom, cible) != 0)
+            ref = ref->suivant;
+
+        if (!ref) {
+            printf("Patient de reference non trouver.\n");
+            free(p);
+            return;
+        }
+
+        p->suivant = ref->suivant;
+        ref->suivant = p;
+    } else {
+        printf("Choix invalide.\n");
+        free(p);
+    }
+
+    printf("Patient ajouter.\n");
+}
+
+void supprimerPatient() {
+    int choix;
+    char nom[100];
+
+    printf("\n--- SUPPRESSION DE PATIENT ---\n");
+    printf("1. Supprimer au debut\n");
+    printf("2. Supprimer a la fin\n");
+    printf("3. Supprimer un patient specifique\n");
+    printf("4. Retour au menu principal\n");
+scanf("%d", &choix);
+
+if (choix == 4) return;
+
+
+    if (!listePatients) {
+        printf("Aucun patient enregistre.\n");
+        return;
+    }
+
+    if (choix == 1) {
+        Patient *tmp = listePatients;
+        listePatients = listePatients->suivant;
+        free(tmp);
+        printf("Patient supprimer.\n");
+    } else if (choix == 2) {
+        if (!listePatients->suivant) {
+            free(listePatients);
+            listePatients = NULL;
+        } else {
+            Patient *tmp = listePatients, *prec = NULL;
+            while (tmp->suivant != NULL) {
+                prec = tmp;
+                tmp = tmp->suivant;
+            }
+            prec->suivant = NULL;
+            free(tmp);
+        }
+        printf("Patient supprimer a la fin.\n");
+    } else if (choix == 3) {
+        printf("Nom du patient a supprimer : ");
+        scanf(" %[^\n]", nom);
+        Patient *tmp = listePatients, *prec = NULL;
+        while (tmp && strcmp(tmp->nom, nom) != 0) {
+            prec = tmp;
+            tmp = tmp->suivant;
+        }
+        if (!tmp) {
+            printf("Patient non trouver.\n");
+            return;
+        }
+        if (!prec) listePatients = tmp->suivant;
+        else prec->suivant = tmp->suivant;
+        free(tmp);
+        printf("Patient supprimer.\n");
+    } else {
+        printf("Choix invalide.\n");
+    }
+}
+
+void modifierPatient() {
+    char nom[100];
+    printf("\n--- MODIFICATION DE PATIENT ---\n");
+    printf("Nom du patient a modifier : ");
+    scanf(" %[^\n]", nom);
+
+    Patient *tmp = listePatients;
+    while (tmp != NULL && strcmp(tmp->nom, nom) != 0) {
+        tmp = tmp->suivant;
+    }
+
+    if (!tmp) {
+        printf("Patient non trouver.\n");
+        return;
+    }
+
+    printf("Nouveau nom: ");
+    char nouveauNom[100];
+    scanf(" %[^\n]", nouveauNom);
+    if (strlen(nouveauNom) > 0)
+        strcpy(tmp->nom, nouveauNom);
+
+    printf("Nouvel age: ");
+    int nouvelAge;
+    scanf("%d", &nouvelAge);
+        tmp->age = nouvelAge;
+
+    printf("Nouveau sexe: ");
+    char nouveauSexe[10];
+    scanf(" %[^\n]", nouveauSexe);
+    if (strlen(nouveauSexe) > 0)
+        strcpy(tmp->sexe, nouveauSexe);
+
+    printf("Nouvelle maladie: ");
+    char nouvelleMaladie[100];
+    scanf(" %[^\n]", nouvelleMaladie);
+    if (strlen(nouvelleMaladie) > 0) {
+        Maladie *m = rechercherMaladieParNom(nouvelleMaladie);
+        if (m) {
+            tmp->maladieAssociee = m;
+        } else {
+            printf("Maladie non trouver. Pas de modification effectuer pour la maladie.\n");
+        }
+    }
+
+    printf("Patient modifie avec succes.\n");
+}
+
+void afficherPatients() {
+    Patient *tmp = listePatients;
+    if (!tmp) {
+        printf("Aucun patient enregistrer.\n");
+        return;
+    }
+
+    while (tmp) {
+        printf("\nNom: %s\nage: %d\nSexe: %s\nMaladie: %s\n",
+               tmp->nom, tmp->age, tmp->sexe,
+               tmp->maladieAssociee ? tmp->maladieAssociee->nom : "Aucune");
+        tmp = tmp->suivant;
+    }
+}
+
+void menu() {
+    int choix;
+    char nom[100];
+
+    do {
+        printf("\n=== MENU PRINCIPAL ===\n");
+        printf("1. Ajouter une maladie\n");
+        printf("2. Afficher toutes les maladies\n");
+        printf("3. Rechercher une maladie\n");
+        printf("4. Modifier une maladie\n");
+        printf("5. Supprimer une maladie\n");
+        printf("6. Afficher les maladies par categorie\n");
+        printf("7. Ajouter un patient\n");
+        printf("8. Afficher les patients\n");
+        printf("9. Supprimer un patient\n");
+        printf("10. Modifier un patient\n");
+        printf("11. Quitter\n");
+        printf("Votre choix : ");
+        scanf("%d", &choix);
+
+        switch (choix) {
+            case 1: ajouterMaladie(); break;
+            case 2: afficherMaladies(); break;
+            case 3:rechercherMaladie();break;
+            case 4:
+                printf("Nom de la maladie a modifier : ");
+                scanf(" %[^\n]", nom);
+                modifierMaladie(nom);
+                break;
+            case 5: supprimerMaladie(); break;
+            case 6: afficherMaladiesParCategorie(); break;
+            case 7: ajouterPatient(); break;
+            case 8: afficherPatients(); break;
+            case 9: supprimerPatient(); break;
+            case 10: modifierPatient(); break;
+            case 11: printf("Fin du programme.\n"); break;
+            default: printf("Choix invalide.\n");
+        }
+
+    } while (choix != 11);
+}
+
+int main() {
+    menu();
+    return 0;
+}
