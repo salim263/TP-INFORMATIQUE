@@ -1,0 +1,103 @@
+//Exercice 1:
+#include <stdio.h>
+
+int main() {
+    char nom[50];
+    int age;
+    FILE *fichier = fopen("donnees.txt", "w");
+
+    if (fichier == NULL) {
+        printf("Erreur lors de l'ouverture du fichier.\n");
+        return 1;
+    }
+
+    printf("Entrez votre nom : ");
+    scanf("%s", nom);
+    printf("Entrez votre âge : ");
+    scanf("%d", &age);
+
+    fprintf(fichier, "Nom: %s\nAge: %d\n", nom, age);
+    fclose(fichier);
+
+    printf("Données enregistrées avec succès.\n");
+    return 0;
+}
+//Exercice 2: 
+#include <stdio.h>
+
+int main() {
+    char ligne[100];
+    FILE *fichier = fopen("donnees.txt", "r");
+
+    if (fichier == NULL) {
+        printf("Impossible d'ouvrir le fichier.\n");
+        return 1;
+    }
+
+    while (fgets(ligne, sizeof(ligne), fichier) != NULL) {
+        printf("%s", ligne);
+    }
+
+    fclose(fichier);
+    return 0;
+}
+//Exercice 3:
+#include <stdio.h>
+
+int main() {
+    FILE *source = fopen("source.txt", "r");
+    FILE *destination = fopen("destination.txt", "w");
+    char c;
+
+    if (source == NULL || destination == NULL) {
+        printf("Erreur lors de l'ouverture des fichiers.\n");
+        return 1;
+    }
+
+    while ((c = fgetc(source)) != EOF) {
+        fputc(c, destination);
+    }
+
+    fclose(source);
+    fclose(destination);
+    printf("Copie terminée avec succès.\n");
+    return 0;
+}
+//Exercice 4:
+#include <stdio.h>
+#include <ctype.h>
+
+int main() {
+    FILE *fichier = fopen("texte.txt", "r");
+    char c;
+    int caracteres = 0, mots = 0, lignes = 0;
+    int dansMot = 0;
+
+    if (fichier == NULL) {
+        printf("Impossible d'ouvrir le fichier.\n");
+        return 1;
+    }
+
+    while ((c = fgetc(fichier)) != EOF) {
+        caracteres++;
+
+        if (c == '\n') {
+            lignes++;
+        }
+
+        if (isspace(c)) {
+            dansMot = 0;
+        } else if (!dansMot) {
+            dansMot = 1;
+            mots++;
+        }
+    }
+
+    fclose(fichier);
+
+    printf("Nombre de caractères : %d\n", caracteres);
+    printf("Nombre de mots       : %d\n", mots);
+    printf("Nombre de lignes     : %d\n", lignes);
+
+    return 0;
+}
